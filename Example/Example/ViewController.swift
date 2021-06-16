@@ -149,8 +149,12 @@ extension ViewController: UINavigationControllerDelegate, UIImagePickerControlle
 }
 
 extension ViewController: RCCameraViewControllerDelegate {
-  func cameraViewController(didFinishScanning message: String) {
-    messageLabel.text = message
+    func cameraViewControllerDidSelectPickImage(userPin: String, vc: UIViewController) {
+        
+    }
+    
+  func cameraViewController(userPin: String) {
+    messageLabel.text = userPin
     messageLabel.isHidden = false
     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
       self.messageLabel.isHidden = true

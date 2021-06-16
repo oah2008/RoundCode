@@ -21,12 +21,13 @@
 //  SOFTWARE.
 
 import Foundation
-
+import UIKit
 public protocol RCCameraViewControllerDelegate: class {
-  
-  func cameraViewController(didFinishScanning message: String)
-  func cameraViewControllerDidCancel()
-  
+    
+    func cameraViewController(userPin: String)
+    func cameraViewControllerDidSelectPickImage(userPin: String,vc:UIViewController)
+    func cameraViewControllerDidCancel()
+    
 }
 
 public extension RCCameraViewControllerDelegate {

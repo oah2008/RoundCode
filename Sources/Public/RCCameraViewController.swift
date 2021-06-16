@@ -35,6 +35,7 @@ public final class RCCameraViewController: UIViewController {
     true
   }
   //Private properties
+  var imagePicker: ImagePicker!
   private var brightness = CGFloat(0)
   private var captureSession = AVCaptureSession()
   private var videoPreviewLayer: AVCaptureVideoPreviewLayer?
@@ -85,7 +86,7 @@ public extension RCCameraViewController {
     configureVideoPreview()
     cameraView.layer.addSublayer(maskLayer)
     cameraView.layer.addSublayer(circleLayer)
-    configureCancelButton()
+    ImagePicker_configureUI()
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -100,13 +101,13 @@ public extension RCCameraViewController {
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    brightness = UIScreen.main.brightness
-    UIScreen.main.setBrightness(to: 1.0)
+ //   brightness = UIScreen.main.brightness
+  //  UIScreen.main.setBrightness(to: 1.0)
   }
   
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
-    UIScreen.main.setBrightness(to: brightness)
+  //  UIScreen.main.setBrightness(to: brightness)
   }
   
   override func viewDidLayoutSubviews() {
@@ -119,21 +120,12 @@ public extension RCCameraViewController {
 //MARK: Private methods
 extension RCCameraViewController {
   
-  private func configureCancelButton() {
-    let cancelButton = UIButton(type: .custom)
-    cancelButton.addTarget(self, action: #selector(cancelPressed), for: .touchUpInside)
-    cancelButton.setImage(UIImage(systemName: "xmark"), for: .normal)
-    cancelButton.tintColor = .white
-    view.addSubview(cancelButton)
-    cancelButton.translatesAutoresizingMaskIntoConstraints = false
-    view.trailingAnchor.constraint(equalTo: cancelButton.trailingAnchor, constant: 30).isActive = true
-    cancelButton.topAnchor.constraint(equalTo: view.layoutMarginsGuide.topAnchor, constant: 20).isActive = true
-  }
   
-  @objc private func cancelPressed() {
+  @objc func cancelPressed() {
     captureSession.stopRunning()
-    delegate?.cameraViewControllerDidCancel()
-    dismiss(animated: true)
+    dismiss(animated: true,completion: {
+        self.delegate?.cameraViewControllerDidCancel()
+    })
   }
   
   private func configureMaskLayer() {
@@ -195,11 +187,13 @@ extension RCCameraViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
     lumaCopy.copyMemory(from: lumaBaseAddress!, byteCount: bytesPerRow * size)
     coder.imageDecoder.size = size
     coder.imageDecoder.bytesPerRow = bytesPerRow
-    if let message = try? coder.decode(buffer: lumaCopy.assumingMemoryBound(to: UInt8.self)) {
+    if let userPin = try? coder.decode(buffer: lumaCopy.assumingMemoryBound(to: UInt8.self)) {
       captureSession.stopRunning()
       DispatchQueue.main.async {[weak self] in
-        self?.delegate?.cameraViewController(didFinishScanning: message)
-        self?.dismiss(animated: true)
+        
+        self?.dismiss(animated: true,completion: {
+            self?.delegate?.cameraViewController(userPin: userPin)
+        })
       }
     }
     lumaCopy.deallocate()
