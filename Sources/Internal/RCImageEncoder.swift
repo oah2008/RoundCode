@@ -35,10 +35,8 @@ struct RCImageEncoder {
     let renderer = UIGraphicsImageRenderer(bounds: rect, format: .default())
     let renderedImage = renderer.image { context in
       let cgContext = context.cgContext
-      if !image.isTransparent {
-        UIColor.white.setFill()
+        #colorLiteral(red: 0.9490196078, green: 0.9333333333, blue: 0.8901960784, alpha: 1).setFill()
         context.fill(rect)
-      }
       cgContext.translateBy(x: image.contentInsets.left, y: image.contentInsets.top)
       cgContext.saveGState()
       cgContext.saveGState()
